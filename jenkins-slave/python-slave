@@ -1,0 +1,40 @@
+FROM ubuntu:trusty
+MAINTAINER Terry Howe <terry.howe@twcable.com>
+
+# Add docker repo and update
+RUN apt-get update &&\
+    apt-get install -y apt-transport-https &&\
+    apt-get install -y build-essential &&\
+    apt-get install -y libssl-dev &&\
+    apt-get install -y python-dev &&\
+    apt-get install -y python-pip &&\
+    apt-get install -y python-virtualenv &&\
+    apt-get install -y ca-certificates &&\
+    apt-get install -y libffi-dev
+COPY docker.list /etc/apt/sources.list.d/docker.list
+RUN apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D &&\
+    apt-get update
+
+# Install and configure a basic SSH server
+RUN apt-get install -y openssh-server &&\
+    sed -i 's|session    required     pam_loginuid.so|session    optional     pam_loginuid.so|g' /etc/pam.d/sshd &&\
+    mkdir -p /var/run/sshd
+
+# Install basic packages for builds
+RUN apt-get install -y openjdk-7-jdk
+RUN apt-get install -y docker-engine
+RUN apt-get clean -y && rm -rf /var/lib/apt/lists/* || true
+
+# Set user jenkins to the image
+RUN adduser --quiet jenkins &&\
+    echo "jenkins:jenkins" | chpasswd
+RUN mkdir /var/tmp/python-dists &&\
+    pip install -d /var/tmp/python-dists setuptools==25.1.0 &&\
+    pip install -d /var/tmp/python-dists pip==8.1.2
+RUN su jenkins -c 'cd ~jenkins && virtualenv --extra-search-dir=/var/tmp/python-dists .venv'
+RUN su jenkins -c 'echo "source .venv/bin/activate" >>~jenkins/.bashrc'
+
+# Standard SSH port
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]

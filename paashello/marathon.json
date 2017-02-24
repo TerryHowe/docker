@@ -1,0 +1,16 @@
+{
+  "id": "/paashello",
+  "cpus": 0.25,
+  "mem": 128.0,
+  "instances": 3,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "paashello",
+      "network": "BRIDGE",
+      "portMappings": [
+        { "containerPort": 5000, "hostPort": 0 }
+      ]
+    }
+  }
+}

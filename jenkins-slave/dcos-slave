@@ -1,0 +1,27 @@
+FROM python-slave
+MAINTAINER Terry Howe <terry.howe@twcable.com>
+
+COPY requirements.txt /home/jenkins/requirements.txt
+RUN mkdir -p /usr/share/ca-certificates/extra/
+COPY twc.crt /usr/share/ca-certificates/extra/twc.crt
+RUN dpkg-reconfigure -f noninteractive ca-certificates
+
+RUN su jenkins -c 'cd ~jenkins && source .venv/bin/activate && \
+    pip install pip &&\
+    pip install -r requirements.txt'
+
+# download and install dcos cli binary
+RUN wget -O /usr/sbin/dcos https://downloads.dcos.io/binaries/cli/linux/x86-64/0.4.15/dcos
+RUN mkdir -p /home/jenkins/.dcos/cache
+COPY dcos.toml /home/jenkins/.dcos/dcos.toml
+RUN chown -R jenkins:jenkins /home/jenkins
+
+RUN mkdir -p /etc/ansible
+RUN chown -R jenkins:jenkins /etc/ansible
+COPY ansible.cfg /etc/ansible/ansible.cfg
+RUN rm /home/jenkins/requirements.txt
+
+# Standard SSH port
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]

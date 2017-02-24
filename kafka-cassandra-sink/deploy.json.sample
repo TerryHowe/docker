@@ -1,0 +1,23 @@
+{
+  "id": "/__TEAMNAME__/kafka-cassandra-sink",
+  "cpus": 0.25,
+  "mem": 128.0,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "__REGISTRY_URL__/__TEAMNAME__/kafka-cassandra-sink:__VERSION__",
+    }
+  },
+  "env": {
+    "SINK_THREAD_COUNT": "2",
+    "CASSANDRA_ADDRESS": "node.cassandra.l4lb.thisdcos.directory:9042",
+    "CASSANDRA_KEYSPACE": "sink_keyspace",
+    "CASSANDRA_SINK": "sink",
+    "KAFKA_ADDRESS": "broker.kafka.l4lb.thisdcos.directory:9092",
+    "KAFKA_SOURCE": "source"
+  },
+  "uris":  [
+    "file://__CREDENTIAL_FILE__"
+  ]
+}
