@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  maze-mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${HOME}/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    restart: always
+    networks:
+      - mazenet
+
+  rubymaze:
+    image: rubymaze:latest
+    ports:
+      - "4000:4000"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      - mazenet
+
+networks:
+  mazenet:
+    driver: bridge
