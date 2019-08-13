@@ -1,6 +1,6 @@
 #docker stop mysql
 #docker rm mysql
-PERSISTENT_DIRECTORY="$HOME/persistent/mysql"
+PERSISTENT_DIRECTORY="/private/mysql"
 mkdir -p $PERSISTENT_DIRECTORY
 cat >${PERSISTENT_DIRECTORY}/my.cnf <<!
 [mysqld]
